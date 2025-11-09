@@ -1,0 +1,39 @@
+name: Matrix Build with Artifacts
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }} - v${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [16, 18, 20]
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      # ✅ REQUIRED IDENTIFIER
+      - name: matrix-fa7170c
+        run: echo "Building for OS=${{ matrix.os }}, Node=${{ matrix.node }}"
+
+      - name: Generate build artifact
+        run: |
+          echo "Build output for OS=${{ matrix.os }}, Node=${{ matrix.node }}" > build-output.txt
+          echo "Timestamp: $(date)" >> build-output.txt
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-fa7170c-${{ matrix.os }}-node${{ matrix.node }}
+          path: build-output.txt
